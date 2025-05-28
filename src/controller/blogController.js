@@ -1,13 +1,28 @@
 import Blog from '../models/blogModel.js'
 
 export const createBlog = async (req, res) => {
-    // const { name, description } = req.body;
-// name and desctiption egreve
-    await Blog.create({
-        name: req.body.name,
-        description: req.body.description,
-    })
-    res.json('hello')
+    try{
+        const {name,description} = req.body;
+        if(!name || !description){
+            res.status(400).json({
+                message:"name and description are required"
+            })
+        }
+        const newBlog = new Blog({
+            name, description
+        })
+        await newBlog.save();
+        res.status(201).json({
+            message:"blog created successfully",
+            blog: newBlog
+        })
+    }catch(err){
+        console.error('error creating blog',err)
+        res.status(500).json({
+            message:"error creating blog",
+            error: err.message
+        })
+    }
 }
 export const getAllBlogs = async (req, res) => {
     try {
@@ -52,5 +67,26 @@ export const updateBlog = async(req,res)=>{
             message:"Error updating blog",
             error:error.message
         })
+    }
+}
+export  const deleteBlog = async(req,res)=>{
+    try{
+        const {id} = req.params;
+     const deleteBlog = await Blog.findByIdAndDelete(id);
+     if(!deleteBlog){
+        return res.status(404).json({
+            message: "Blog not found"
+        })
+     }
+     res.status(200).json({
+        message: "Blog deleted successfully",
+        blog: deleteBlog
+     })
+    }catch(err){
+        console.log('error deleting blog', err);
+        res.status(500).json({
+            message: "Error deleting blog",
+            error: err.message
+        });
     }
 }
