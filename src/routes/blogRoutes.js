@@ -1,16 +1,10 @@
 import express from "express";
-import {createBlog, getAllBlogs} from "../controller/blogController.js";
+import {createBlog, getAllBlogs, getBlogById} from "../controller/blogController.js";
 
 const router = express.Router();
 
-router.get('/', (req, res) => {
-    res.status(200).json({
-        message: 'Welcome to the blog API'
-    });
-})
-
-
-router.post('/create', createBlog)
-router.get('getBlogs',getAllBlogs)
+router.post('/create', createBlog);
+router.get('/',getAllBlogs);
+router.get('/:id', getBlogById);
 
 export default router;
