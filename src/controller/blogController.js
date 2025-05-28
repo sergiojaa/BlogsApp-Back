@@ -1,16 +1,14 @@
 import Blog from '../models/blogModel.js'
+import { blogSchema } from '../validation/blogValidation.js'
 
 export const createBlog = async (req, res) => {
     try{
-        const {name,description} = req.body;
-        if(!name || !description){
-            res.status(400).json({
-                message:"name and description are required"
-            })
-        }
+
+    const validatedData = blogSchema.parse(req.body)
         const newBlog = new Blog({
-            name, description
-        })
+            name: validatedData.name,
+            description: validatedData.description,
+                });
         await newBlog.save();
         res.status(201).json({
             message:"blog created successfully",
@@ -18,6 +16,12 @@ export const createBlog = async (req, res) => {
         })
     }catch(err){
         console.error('error creating blog',err)
+        if (err.name === 'ZodError') {
+            return res.status(400).json({
+                message: "Validation error",
+                errors: err.errors,
+            });
+        }
         res.status(500).json({
             message:"error creating blog",
             error: err.message
